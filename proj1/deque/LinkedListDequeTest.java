@@ -1,5 +1,6 @@
 package deque;
 
+import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -135,5 +136,47 @@ public class LinkedListDequeTest {
         }
 
 
+    }
+    @Test
+    public void randomizedTest() {
+        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        ArrayDeque<Integer> B=new ArrayDeque<>();
+
+        int N = 1000000;
+        for (int i = 0; i < N; i += 1) {
+            int operationNumber = StdRandom.uniform(0, 6);
+            if (operationNumber == 0) {
+                // addLast
+                int randVal = StdRandom.uniform(0, 100);
+                L.addLast(randVal);
+                B.addLast(randVal);
+                System.out.println("addLast(" + randVal + ")");
+            } else if (operationNumber == 1) {
+                // size
+                int size = L.size();
+                //System.out.println("L.size: " + size);
+                assertEquals(L.size(),B.size());
+            }else if (L.size()==0) {
+                continue;
+            }else if(operationNumber==2){
+                //System.out.println("L.removefirst(" +L.() + ")");
+                //System.out.println("B.removefirst(" +B.getLast() + ")");
+                assertEquals(L.removeFirst(),B.removeFirst());
+            }else if(operationNumber==3){
+                //System.out.println("L.removeLast(" +L.removeLast() + ")");
+                //System.out.println("B.removeLast(" +B.removeLast() + ")");
+                assertEquals(L.removeLast(),B.removeLast());
+            }else if (operationNumber == 4) {
+                int randVal = StdRandom.uniform(0, 100);
+                L.addFirst(randVal);
+                B.addFirst(randVal);
+                System.out.println("addfirst(" + randVal + ")");
+            }else if (operationNumber == 5) {
+                int randVal = StdRandom.uniform(0, L.size());
+                assertEquals(L.get(randVal),B.get(randVal));
+                int tmp=L.getRecursive(randVal);
+                assertEquals(L.get(randVal),L.getRecursive(randVal));
+            }
+        }
     }
 }

@@ -1,8 +1,8 @@
 package deque;
 
 import java.util.Iterator;
-
-public class LinkedListDeque<T> implements Iterable<T>{
+//import java.lang.Iterable;
+public class LinkedListDeque<T> implements Deque<T>{
 
     public  class itemnode{
         public T value;
@@ -23,7 +23,7 @@ public class LinkedListDeque<T> implements Iterable<T>{
         sentinel.next=sentinel;
 
     }
-    public class LLdequeIterator implements Iterator<T> {
+    private class LLdequeIterator implements Iterator<T> {
         private int wizpos;
         public boolean hasNext(){
             return wizpos<size;
@@ -49,17 +49,17 @@ public class LinkedListDeque<T> implements Iterable<T>{
         sentinel.next=new itemnode(item,sentinel.next,sentinel);
         p.prev=sentinel.next;
     }
-
+/*
     public boolean isEmpty(){
         return size==0;
     }
-
+*/
     public int size(){
         return size;
     }
 
     public void printDeque(){
-        for(T i:this){
+        for(T i:this) {
             System.out.println(i);
         }
 
@@ -111,10 +111,19 @@ public class LinkedListDeque<T> implements Iterable<T>{
         }
         return true;
     }
+
     public T getRecursive(int index){
+        itemnode tmp=sentinel;
+        if(index<0||index>size)
+            return null;
+        return getRecursivehelper(index,tmp);
+    }
+    public T getRecursivehelper(int index,itemnode tmp){
         if(index==0)
-            return
-        return getRecursive(index--)
+            return tmp.next.value;
+        tmp=tmp.next;
+        index-=1;
+        return getRecursivehelper(index,tmp);
     }
 
 }
