@@ -2,128 +2,135 @@ package deque;
 
 import java.util.Iterator;
 //import java.lang.Iterable;
-public class LinkedListDeque<T> implements Deque<T>,Iterable<T>{
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
-    public  class itemnode{
-        public T value;
-        public itemnode next;
-        public itemnode prev;
-        public itemnode(T x,itemnode n,itemnode p){
-            value=x;
-            next=n;
-            prev=p;
+    private  class Itemnode {
+        private T value;
+        private Itemnode next;
+        private Itemnode prev;
+        public Itemnode(T x, Itemnode n, Itemnode p) {
+            value = x;
+            next = n;
+            prev = p;
         }
     }
-    private itemnode sentinel;
+    private Itemnode sentinel;
     private int size;
-    public LinkedListDeque(){
-        size=0;
-        sentinel=new itemnode(null,null,null);
-        sentinel.prev=sentinel;
-        sentinel.next=sentinel;
+    public LinkedListDeque() {
+        size = 0;
+        sentinel = new Itemnode(null,null,null);
+        sentinel.prev = sentinel;
+        sentinel.next = sentinel;
 
     }
     private class LLdequeIterator implements Iterator<T> {
         private int wizpos;
-        public boolean hasNext(){
-            return wizpos<size;
+        public boolean hasNext() {
+            return wizpos < size;
         }
-        public T next(){
-            T returnitem=get(wizpos);
-            wizpos+=1;
+        public T next() {
+            T returnitem = get(wizpos);
+            wizpos +=1 ;
             return returnitem;
         }
     }
-    public Iterator<T> iterator(){
+    public Iterator<T> iterator() {
         return new LLdequeIterator();
     }
     public void addLast(T item){
-        size+=1;
-        itemnode p=sentinel.prev;//old last item
-        sentinel.prev=new itemnode(item,sentinel,sentinel.prev);//new last item
-        p.next=sentinel.prev;
+        size += 1;
+        Itemnode p = sentinel.prev;//old last item
+        sentinel.prev = new Itemnode(item,sentinel,sentinel.prev);//new last item
+        p.next = sentinel.prev;
     }
-    public void addFirst(T item){
-        size+=1;
-        itemnode p=sentinel.next;
-        sentinel.next=new itemnode(item,sentinel.next,sentinel);
-        p.prev=sentinel.next;
+    public void addFirst(T item) {
+        size += 1;
+        Itemnode p = sentinel.next;
+        sentinel.next = new Itemnode(item,sentinel.next,sentinel);
+        p.prev = sentinel.next;
     }
 /*
     public boolean isEmpty(){
         return size==0;
     }
 */
-    public int size(){
+    public int size() {
         return size;
     }
 
-    public void printDeque(){
-        for(T i:this) {
+    public void printDeque() {
+        for (T i:this) {
             System.out.println(i);
         }
 
     }
 
-    public T removeFirst(){
-        itemnode item=sentinel.next;//old first
-        if(item!=sentinel) {
+    public T removeFirst() {
+        Itemnode item = sentinel.next;//old first
+        if (item != sentinel) {
             size -= 1;
             sentinel.next = item.next;//new first
-            item.next.prev=sentinel;
+            item.next.prev = sentinel;
         }
         return item.value;
     }
-    public T removeLast(){
-       itemnode item=sentinel.prev;
-       if(item!=sentinel) {
+    public T removeLast() {
+        Itemnode item = sentinel.prev;
+       if (item != sentinel) {
            size -= 1;
            sentinel.prev = item.prev;
-           item.prev.next=sentinel;
+           item.prev.next = sentinel;
        }
         return item.value;
     }
-    public T get(int index){
-        itemnode p=sentinel.next;
-        for(int i=0;i<size;i++){
-            if(i==index)
+    public T get(int index) {
+        Itemnode p = sentinel.next;
+        for (int i = 0; i < size; i++) {
+            if (i == index) {
                 return p.value;
-            p=p.next;
+            }
+            p = p.next;
         }
         return null;
     }
     @Override
-    public boolean equals(Object o){
-        if(o==null)
+    public boolean equals(Object o) {
+        if (o == null) {
             return false;
-        if(this==o)
+        }
+        if (this == o) {
             return true;
-        if(this.getClass()!=o.getClass())
+        }
+        if (this.getClass() != o.getClass()) {
             return false;
-        LinkedListDeque<T> other=(LinkedListDeque<T>)o;
-        if(this.size()!=other.size())
+        }
+        LinkedListDeque<T> other = (LinkedListDeque<T>)o;
+        if (this.size() !=  other.size())
             return false;
-        itemnode p=other.sentinel;
-        for(T item :this){
-            if(item!=p.next)
+        Itemnode p = other.sentinel;
+        for (T item :this) {
+            if (item != p.next) {
                 return false;
-            p=p.next;
+            }
+            p = p.next;
         }
         return true;
     }
 
-    public T getRecursive(int index){
-        itemnode tmp=sentinel;
-        if(index<0||index>size)
+    public T getRecursive(int index) {
+        Itemnode tmp = sentinel;
+        if(index < 0 || index > size) {
             return null;
-        return getRecursivehelper(index,tmp);
+        }
+        return getRecursivehelper(index, tmp);
     }
-    public T getRecursivehelper(int index,itemnode tmp){
-        if(index==0)
+    private T getRecursivehelper(int index, Itemnode tmp) {
+        if (index == 0) {
             return tmp.next.value;
-        tmp=tmp.next;
-        index-=1;
-        return getRecursivehelper(index,tmp);
+        }
+        tmp = tmp.next;
+        index -= 1;
+        return getRecursivehelper(index, tmp);
     }
 
 }

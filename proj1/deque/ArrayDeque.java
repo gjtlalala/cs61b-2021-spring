@@ -3,31 +3,31 @@ package deque;
 import java.util.Iterator;
 //import java.lang.Iterable;
 
-public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private int size;
     private int nextfirst;
     private int nextlast;
-    public T[] items;
-    public ArrayDeque(){
-        items=(T[])new Object[8];
-        size=0;
-        nextfirst=0;
-        nextlast=1;
+    private T[] items;
+    public ArrayDeque() {
+        items = (T[]) new Object[8];
+        size = 0;
+        nextfirst = 0;
+        nextlast = 1;
     }
-    public ArrayDeque(int capacity){
+    /*public ArrayDeque(int capacity){
         items=(T[])new Object[capacity];
         size=0;
         nextfirst=0;
         nextlast=1;
-    }
-    public int minusOne(int index){
-        index-=1;
-        if(index<0)
-            index=items.length-1;
+    }*/
+    private int minusOne(int index) {
+        index -= 1;
+        if (index < 0)
+            index = items.length-1;
         return index;
     }
-    private void resize(int capcity){
-        T[] newarray=(T[])new Object [capcity];
+    private void resize(int capcity) {
+        T[] newarray = (T[]) new Object [capcity];
         /*if(nextlast>nextfirst) {
             for (int i = nextfirst + 1; i < size; i++) {
                 newarray[i] = items[i];
@@ -35,106 +35,112 @@ public class ArrayDeque<T> implements Deque<T>,Iterable<T>{
         }*/
         //System.arraycopy(items,0,newarray,0,size);
 
-        for(int i=0;i<size;i++){
+        for (int i = 0; i < size; i++) {
             //nextfirst=(nextfirst+1)%items.length;
             //newarray[i]=get(nextfirst);
-            newarray[i]=get(i);
+            newarray[i] = get(i);
         }
-        nextfirst=capcity-1;
-        nextlast=size;
-        items=newarray;
+        nextfirst = capcity-1;
+        nextlast = size;
+        items = newarray;
     }
-    public void addFirst(T item){
-        if (size==items.length)
+    public void addFirst(T item) {
+        if (size == items.length)
             resize(2*size);
         size += 1;
-        items[nextfirst]=item;
-        nextfirst=minusOne(nextfirst);
+        items[nextfirst] = item;
+        nextfirst = minusOne(nextfirst);
 
     }
 
-    public void addLast(T item){
+    public void addLast(T item) {
 
-        if (size==items.length)
+        if (size == items.length)
             resize(2*size);
-        size+=1;
-        items[nextlast]=item;
-        nextlast=(nextlast+1)%(items.length);
+        size += 1;
+        items[nextlast] = item;
+        nextlast = (nextlast + 1) % (items.length);
     }
     /*public boolean isEmpty(){
         return size==0;
     }*/
-    public int size(){
+    public int size() {
         return size;
     }
 
-    public T removeFirst(){
-        if(items.length>4*size&&size>4)
-            resize(size*2);
-        int first=(nextfirst+1)%(items.length);
-        T returnitem =items[first];
-        if (returnitem!=null) {
-            nextfirst=first;
+    public T removeFirst() {
+        if (items.length > 4 * size && size > 4) {
+            resize(size * 2);
+        }
+        int first = (nextfirst + 1) % (items.length);
+        T returnitem = items[first];
+        if (returnitem != null) {
+            nextfirst = first;
             items[first] = null;
             size -= 1;
         }
         return returnitem;
     }
-    public T removeLast(){
-        if(items.length>4*size&&size>4)
+    public T removeLast() {
+        if (items.length > 4*size && size>4)
             resize(size*2);
-        int last=minusOne(nextlast);
-        T returnitem=items[last];
-        if(returnitem!=null) {
-            nextlast=last;
+        int last = minusOne(nextlast);
+        T returnitem = items[last];
+        if (returnitem != null) {
+            nextlast = last;
             items[last] = null;
             size -= 1;
         }
         return returnitem;
     }
 
-    public T get(int index){
-        return items[(nextfirst+index+1)%items.length];
+    public T get(int index) {
+        return items[(nextfirst + index + 1) % items.length];
     }
     private class ArraydequeIterator implements Iterator<T> {
         private int wizpos;
         private int num;
-        public void ArraydequeIterator(){
-            wizpos=(nextfirst+1)%(items.length);
-            num=0;
+        public void ArraydequeIterator() {
+            wizpos = (nextfirst + 1) % (items.length);
+            num = 0;
         }
-        public boolean hasNext(){
-            return num<size;
+        public boolean hasNext() {
+            return num < size;
         }
-        public T next(){
-            T returnitem=get(wizpos);
-            wizpos=(wizpos+1)%items.length;
-            num+=1;
+        public T next() {
+            T returnitem = get(wizpos);
+            wizpos = (wizpos + 1) % items.length;
+            num += 1;
             return returnitem;
         }
     }
-    public Iterator<T> iterator(){
+    public Iterator<T> iterator() {
         return new ArraydequeIterator();
     }
-    public void printDeque(){
-        for(T i:this){
+    public void printDeque() {
+        for (T i:this){
             System.out.println(i);
         }
     }
     @Override
-    public boolean equals(Object o){
-        if(o==null)
+    public boolean equals(Object o) {
+        if (o == null) {
             return false;
-        if(o==this)
+        }
+        if (o == this) {
             return true;
-        if(o.getClass()!=this.getClass())
+        }
+        if (o.getClass() != this.getClass()) {
             return false;
-        ArrayDeque<T> other=(ArrayDeque<T>)o;
-        if(other.size()!=this.size())
+        }
+        ArrayDeque<T> other = (ArrayDeque<T>) o;
+        if (other.size() != this.size()) {
             return false;
-        for(int i=0;i<this.items.length;i++){
-            if(this.get(i)!=other.get(i))
+        }
+        for (int i = 0; i < this.size; i++) {
+            if (this.get(i) != other.get(i)) {
                 return false;
+            }
         }
         return true;
     }
