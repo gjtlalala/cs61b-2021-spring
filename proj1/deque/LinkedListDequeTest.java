@@ -142,7 +142,7 @@ public class LinkedListDequeTest {
         LinkedListDeque<Integer> L = new LinkedListDeque<>();
         ArrayDeque<Integer> B=new ArrayDeque<>();
 
-        int N = 1000000;
+        int N = 100000;
         for (int i = 0; i < N; i += 1) {
             int operationNumber = StdRandom.uniform(0, 6);
             if (operationNumber == 0) {
@@ -176,6 +176,8 @@ public class LinkedListDequeTest {
                 assertEquals(L.get(randVal),B.get(randVal));
                 int tmp=L.getRecursive(randVal);
                 assertEquals(L.get(randVal),L.getRecursive(randVal));
+                assertTrue("equal",L.equals(B));
+                assertTrue("equal",B.equals(L));
             }
         }
     }
