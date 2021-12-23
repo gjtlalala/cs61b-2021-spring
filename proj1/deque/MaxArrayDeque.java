@@ -4,15 +4,15 @@ package deque;
 import java.util.Comparator;
 
 public class MaxArrayDeque<T> extends ArrayDeque<T> {
-    private Comparator<T> MaxADcomparator;
+    private Comparator<T> maxADcomparator;
     public MaxArrayDeque(Comparator<T> c) {
         super();
-        MaxADcomparator = c;
+        maxADcomparator = c;
     }
     public T max() {
         T max = get(0);
         for (T i:this) {
-            if (MaxADcomparator.compare(i, max) > 0) {
+            if (maxADcomparator.compare(i, max) > 0) {
                 max = i;
             }
         }

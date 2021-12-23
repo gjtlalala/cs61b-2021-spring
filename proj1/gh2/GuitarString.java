@@ -1,9 +1,11 @@
 package gh2;
 
 
- import deque.ArrayDeque;
- import deque.Deque;
 
+
+
+ import deque.Deque;
+ import deque.LinkedListDeque;
 
 
 //Note: This file will not compile until you complete the Deque implementations
@@ -22,7 +24,7 @@ public class GuitarString {
     public GuitarString(double frequency) {
 
         int capacity = (int) Math.round(SR / frequency);
-        buffer = new ArrayDeque<Double>();
+        buffer = new LinkedListDeque<>();
         for (int i = 0; i < capacity; i++) {
             buffer.addLast(0.0);
         }
