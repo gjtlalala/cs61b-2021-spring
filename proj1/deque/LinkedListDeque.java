@@ -18,7 +18,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private int size;
     public LinkedListDeque() {
         size = 0;
-        sentinel = new Itemnode(null,null,null);
+        sentinel = new Itemnode(null, null, null);
         sentinel.prev = sentinel;
         sentinel.next = sentinel;
 
@@ -33,7 +33,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
         public T next() {
             T returnitem = get(wizpos);
-            wizpos += 1 ;
+            wizpos += 1;
             return returnitem;
         }
     }
@@ -42,8 +42,8 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
     public void addLast(T item) {
         size += 1;
-        Itemnode p = sentinel.prev;//old last item
-        sentinel.prev = new Itemnode(item, sentinel, sentinel.prev);//new last item
+        Itemnode p = sentinel.prev; //old last item
+        sentinel.prev = new Itemnode(item, sentinel, sentinel.prev); //new last item
         p.next = sentinel.prev;
     }
     public void addFirst(T item) {
@@ -69,10 +69,10 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public T removeFirst() {
-        Itemnode item = sentinel.next;//old first
+        Itemnode item = sentinel.next; //old first
         if (item != sentinel) {
             size -= 1;
-            sentinel.next = item.next;//new first
+            sentinel.next = item.next; //new first
             item.next.prev = sentinel;
         }
         return item.value;
@@ -107,9 +107,13 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         /*if (this.getClass() != o.getClass()) {
             return false;
         }*/
-        Deque<T> other = (Deque<T>)o;
-        if (this.size() !=  other.size())
+        if (!(o instanceof LinkedListDeque)) {
             return false;
+        }
+        LinkedListDeque<T> other = (LinkedListDeque<T>) o;
+        if (this.size() !=  other.size()) {
+            return false;
+        }
         /*Itemnode p = other.sentinel;
         for (T item :this) {
             if (item != p.next) {

@@ -139,8 +139,10 @@ public class LinkedListDequeTest {
     }
     @Test
     public void randomizedTest() {
-        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        //LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        ArrayDeque<Integer> L=new ArrayDeque<>();
         ArrayDeque<Integer> B=new ArrayDeque<>();
+        //LinkedListDeque<Integer> B = new LinkedListDeque<>();
 
         int N = 100000;
         for (int i = 0; i < N; i += 1) {
@@ -174,8 +176,8 @@ public class LinkedListDequeTest {
             }else if (operationNumber == 5) {
                 int randVal = StdRandom.uniform(0, L.size());
                 assertEquals(L.get(randVal),B.get(randVal));
-                int tmp=L.getRecursive(randVal);
-                assertEquals(L.get(randVal),L.getRecursive(randVal));
+                //int tmp=L.getRecursive(randVal);
+                //assertEquals(L.get(randVal),L.getRecursive(randVal));
                 assertTrue("equal",L.equals(B));
                 assertTrue("equal",B.equals(L));
             }

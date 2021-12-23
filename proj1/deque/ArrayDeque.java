@@ -57,8 +57,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
     public void addLast(T item) {
 
-        if (size == items.length)
+        if (size == items.length) {
             resize(2 * size);
+        }
         size += 1;
         items[nextlast] = item;
         nextlast = (nextlast + 1) % (items.length);
@@ -121,7 +122,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return new ArraydequeIterator();
     }
     public void printDeque() {
-        for (T i:this){
+        for (T i:this) {
             System.out.println(i);
         }
     }
@@ -136,7 +137,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         /*if (o.getClass() != this.getClass()) {
             return false;
         }*/
-        Deque<T> other = (Deque<T>) o;
+        if (!(o instanceof ArrayDeque)) {
+            return false;
+        }
+        ArrayDeque<T> other = (ArrayDeque<T>)  o;
         if (other.size() != this.size()) {
             return false;
         }
