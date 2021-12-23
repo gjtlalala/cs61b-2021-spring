@@ -10,15 +10,18 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
         maxADcomparator = c;
     }
     public T max() {
-        T max = get(0);
+        /*T max = get(0);
         for (T i:this) {
             if (maxADcomparator.compare(i, max) > 0) {
                 max = i;
             }
         }
-        return max;
+        return max;*/
+        return max(maxADcomparator);
     }
     public T max(Comparator<T> c) {
+        if(size()==0)
+            return null;
         T max = get(0);
         for (T i:this) {
             if (c.compare(i, max) > 0) {
