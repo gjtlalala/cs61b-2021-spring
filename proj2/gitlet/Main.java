@@ -34,15 +34,16 @@ public class Main {
                 // TODO: handle the `add [filename]` command
                 hastwoarg(args);
                 name = args[1];
-                if (name == null) {
-                    Utils.error("Please enter a commit message.");
-                }
+
                 Repository.add(name);
                 break;
             // TODO: FILL THE REST IN
             case "commit":
                 hastwoarg(args);
                 message = args[1];
+                if (message.equals("")) {
+                    Utils.error("Please enter a commit message.");
+                }
                 Repository.commit(message);
                 break;
             case "rm":

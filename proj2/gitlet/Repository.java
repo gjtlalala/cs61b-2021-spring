@@ -162,22 +162,27 @@ public class Repository {
             System.out.println("File does not exist.");
             return;
         }
+        File f = getstagingrmfile(filename);
+        if (f != null) {
+            f.delete();//restrictedDelete(f);
+            return;
+        }
         String fileid = Utils.sha1(readContentsAsString(addfile));
-        File f = getstagingaddfile(filename);
+        f = getstagingaddfile(filename);
         if (f == null || !readContentsAsString(f).equals(fileid)) {//one is not exist;one is not equal;both need new object and new stagingfie contents
             //File blob = createnewobject(addfile,fileid);
             //createnewstagefile(filename,blob);
             //System.out.println("filename "+filename +"fileid "+fileid);
             createnewobject(addfile,fileid);
             createstageaddfile(filename,fileid);
-            f = getstagingrmfile(filename);
+            /*f = getstagingrmfile(filename);
             if (f != null) {
                 restrictedDelete(f);
-            }
+            }*/
 
         }
-        else if(fileid.equals(getcurcommitfileid(filename))) {
-            restrictedDelete(f);
+        if(fileid.equals(getcurcommitfileid(filename))) {
+            f.delete();
         }
 
     }
@@ -188,7 +193,7 @@ public class Repository {
     public static void commit(String message){
         gitletdirinit();
         List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
-        if (filelist == null) {
+        if (filelist.isEmpty()) {
             System.out.println("No changes added to the commit.");
             return;
         }
@@ -203,7 +208,7 @@ public class Repository {
                 stagfile.delete();//restrictedDelete(stagfile);
         }
         filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
-        if(filelist != null) {
+        if(!filelist.isEmpty()) {
             for (String name : filelist) {
                 File stagfile = join(STAGINGREMOVE_DIR, name);
                 String id = readContentsAsString(stagfile);
@@ -227,15 +232,15 @@ public class Repository {
         gitletdirinit();
         Boolean error = true;
         File f = getstagingaddfile(name);
-        if(getstagingaddfile(name)!=null) {
-            restrictedDelete(f);
+        if (getstagingaddfile(name) != null) {
+            f.delete();//restrictedDelete(f);
             error = false;
         }
         Commit c = getheadcommit();
         Map<String, String> map = c.getMap();
         if(map.containsKey(name)) {
             createstageremovefile(name);
-            File file = join(CWD,name);
+            File file = join(CWD, name);
             restrictedDelete(file);
             error = false;
         }
@@ -278,7 +283,7 @@ public class Repository {
             else
                 System.out.println(branchname);
         }
-
+        System.out.println("");
         System.out.println("=== Staged Files ===");
         List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
         if(filelist != null) {
@@ -286,7 +291,7 @@ public class Repository {
                 System.out.println(filename);
             }
         }
-
+        System.out.println("");
         System.out.println("=== Removed Files ===");
         filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
         if(filelist != null) {
@@ -294,6 +299,11 @@ public class Repository {
                 System.out.println(filename);
             }
         }
+        System.out.println("");
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.println("");
+        System.out.println("=== Untracked Files ===");
+
     }
     private static void replaceworkingfile(String id, String name) {
         File blob = join(OBJECT_DIR, id);
@@ -425,7 +435,7 @@ public class Repository {
         }
         for (String name: filelist) {
             File stagfile = join(STAGINGADD_DIR,name);
-            restrictedDelete(stagfile);
+            stagfile.delete();//restrictedDelete(stagfile);
         }
         filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
         if (filelist == null) {
@@ -433,7 +443,7 @@ public class Repository {
         }
         for (String name: filelist) {
             File stagfile = join(STAGINGREMOVE_DIR,name);
-            restrictedDelete(stagfile);
+            stagfile.delete();//restrictedDelete(stagfile);
         }
     }
     public static void reset(String id){

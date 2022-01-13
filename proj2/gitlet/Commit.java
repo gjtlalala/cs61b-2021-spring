@@ -125,15 +125,19 @@ public class Commit implements Serializable {
                 System.out.println(f.getName());
             }
         }*/
+        Boolean nofind = true;
         List<String> commitlist = Utils.plainFilenamesIn(COMMIT_FOLDER);
         for (String name: commitlist) {
             File f = join(COMMIT_FOLDER, name);
             c =  readObject(f,Commit.class);
             if(c.getMessage().equals(message)) {
                 System.out.println(name);
+                nofind = false;
             }
         }
-        System.out.println("Found no commit with that message.");
+        if (nofind) {
+            System.out.println("Found no commit with that message.");
+        }
     }
 
 }
