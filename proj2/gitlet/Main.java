@@ -42,7 +42,8 @@ public class Main {
                 hastwoarg(args);
                 message = args[1];
                 if (message.equals("")) {
-                    Utils.error("Please enter a commit message.");
+                    System.out.println("Please enter a commit message.");
+                    System.exit(0);
                 }
                 Repository.commit(message);
                 break;

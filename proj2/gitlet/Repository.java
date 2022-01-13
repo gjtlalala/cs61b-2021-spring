@@ -181,6 +181,7 @@ public class Repository {
             }*/
 
         }
+        f = getstagingaddfile(filename);
         if(fileid.equals(getcurcommitfileid(filename))) {
             f.delete();
         }
@@ -192,27 +193,28 @@ public class Repository {
     }*/
     public static void commit(String message){
         gitletdirinit();
-        List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
-        if (filelist.isEmpty()) {
+        List<String> addfilelist = plainFilenamesIn(STAGINGADD_DIR);
+        List<String> rmfilelist = plainFilenamesIn(STAGINGREMOVE_DIR);
+        if (addfilelist.isEmpty() && rmfilelist.isEmpty()) {
             System.out.println("No changes added to the commit.");
             return;
         }
         Commit head = getheadcommit();
         String parent = getheadid();//readContentsAsString(HEAD);
         Map<String,String> filemap = head.getMap();
-        for (String name: filelist) {
+        for (String name: addfilelist) {
                 File stagfile = join(STAGINGADD_DIR,name);
                 String id = readContentsAsString(stagfile);
                 //File blob = join(OBJECT_DIR, id);
                 filemap.put(name, id);
                 stagfile.delete();//restrictedDelete(stagfile);
         }
-        filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
-        if(!filelist.isEmpty()) {
-            for (String name : filelist) {
+
+        if(!rmfilelist.isEmpty()) {
+            for (String name : rmfilelist) {
                 File stagfile = join(STAGINGREMOVE_DIR, name);
-                String id = readContentsAsString(stagfile);
-                filemap.remove(name, id);
+                //String id = readContentsAsString(stagfile);
+                filemap.remove(name);
                 stagfile.delete();//restrictedDelete(stagfile);
             }
         }
@@ -226,6 +228,7 @@ public class Repository {
         Commit commit = new Commit(message,currentTime,parent,filemap);
         String id = commit.saveCommit();
         sethead(id);
+        setbranchhead(getcurbranchname(),id);
 
     }
     public static void rm(String name){
