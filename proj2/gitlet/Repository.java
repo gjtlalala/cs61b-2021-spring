@@ -147,6 +147,7 @@ public class Repository {
         File newfile = join(STAGINGREMOVE_DIR, name);
         //Utils.writeObject(newfile, blob);
         //Utils.writeContents(newfile, fileid);
+        writeContents(newfile,"0");
     }
     private static String  getcurcommitfileid(String filename) {
         Commit c = getheadcommit();
