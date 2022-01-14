@@ -395,11 +395,12 @@ public class Repository {
                 System.out.println("No need to checkout the current branch.");
                 return;
             }
-            String id = getbranchheadid(branchname);
-            if(id == null) {
+            List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
+            if(!branchlist.contains(branchname)) {
                 System.out.println("No such branch exists.");
                 return;
             }
+            String id = getbranchheadid(branchname);
             checkoutcommitidallfile(id);
             setCurbranch(branchname);
             sethead(id);

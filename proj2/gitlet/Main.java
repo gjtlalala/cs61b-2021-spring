@@ -105,7 +105,7 @@ public class Main {
                 }
                 Repository.branch(name);
                 break;
-            case "rmbranch":
+            case "rm-branch":
                 hastwoarg(args);
                 name = args[1];
                 if (name == null) {
