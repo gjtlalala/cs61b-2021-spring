@@ -315,10 +315,21 @@ public class Repository {
         File workdir = join(CWD, name);
         writeContents(workdir, readContents(blob));
     }
-    private static boolean curbranchtrackfile(String filename) {
+    /*private static boolean curbranchtrackfile(String filename) {
         Commit headcommit = getheadcommit();
         Map<String ,String> curheadmap = headcommit.getMap();
         return curheadmap.containsKey(filename);
+    }*/
+    private static boolean fileuntrackedcurbranch(String filename) {
+        Commit headcommit = getheadcommit();
+        while(headcommit != null) {
+            Map<String, String> curheadmap = headcommit.getMap();
+            if (curheadmap.containsKey(filename)) {
+                return false;
+            }
+            headcommit = headcommit.getParentcommit();
+        }
+        return true;
     }
     private static void checkoutcommitidallfile(String commitid){
         Commit c = Commit.getCommit(commitid);
@@ -332,11 +343,10 @@ public class Repository {
         String branchfilename;
         for (Map.Entry<String, String> entry : copyfrommap.entrySet()) {
             branchfilename = entry.getKey();
-            if(!curheadmap.containsKey(branchfilename)) {
+            if(fileuntrackedcurbranch(branchfilename)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
-           // replaceworkingfile(branchfilename,entry.getKey());
         }
         for (Map.Entry<String, String> entry : copyfrommap.entrySet()) {
             branchfilename = entry.getKey();
@@ -372,7 +382,7 @@ public class Repository {
                 System.out.println("File does not exist in that commit.");
                 return;
             }
-            if(!curbranchtrackfile(filename)) {
+            if(fileuntrackedcurbranch(filename)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
@@ -383,10 +393,12 @@ public class Repository {
         else if(branchname != null) {
             if(branchname.equals(getcurbranchname())) {
                 System.out.println("No need to checkout the current branch.");
+                return;
             }
             String id = getbranchheadid(branchname);
             if(id == null) {
                 System.out.println("No such branch exists.");
+                return;
             }
             checkoutcommitidallfile(id);
             setCurbranch(branchname);

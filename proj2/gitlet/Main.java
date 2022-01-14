@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Please enter a command.");
-            System.exit(-1);
+            System.exit(0);
             //Utils.error("Please enter a command.");
         }
 
@@ -76,7 +76,9 @@ public class Main {
                 }
                 if (args.length == 3) {
                     if (!args[1].equals("--")) {
-                        Utils.error("Incorrect operands.");
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                        //Utils.error("Incorrect operands.");
                     }
                     name = args[2];
                     Repository.checkout(null,name,null);
@@ -84,7 +86,9 @@ public class Main {
                 if (args.length == 4) {
                     id = args[1];
                     if (!args[2].equals("--")) {
-                        Utils.error("Incorrect operands.");
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                        //Utils.error("Incorrect operands.");
                     }
                     name = args[3];
                     Repository.checkout(id,name,null);
@@ -94,7 +98,10 @@ public class Main {
                 hastwoarg(args);
                 name = args[1];
                 if (name == null) {
-                    Utils.error("Please enter a branch name.");
+                    //Utils.error("Please enter a branch name.");
+                    System.out.println("Please enter a branch name.");
+                    System.exit(0);
+
                 }
                 Repository.branch(name);
                 break;
@@ -102,7 +109,9 @@ public class Main {
                 hastwoarg(args);
                 name = args[1];
                 if (name == null) {
-                    Utils.error("Please enter a branch name.");
+                    //Utils.error("Please enter a branch name.");
+                    System.out.println("Please enter a branch name.");
+                    System.exit(0);
                 }
                 Repository.rmbranch(name);
                 break;
@@ -110,7 +119,9 @@ public class Main {
                 hastwoarg(args);
                 id = args[1];
                 if (id == null) {
-                    Utils.error("Please enter an id.");
+                    //Utils.error("Please enter an id.");
+                    System.out.println("Please enter an id.");
+                    System.exit(0);
                 }
                 Repository.reset(id);
                 break;
@@ -118,13 +129,15 @@ public class Main {
                 hastwoarg(args);
                 name = args[1];
                 if (name == null) {
-                    Utils.error("Please enter a branch name.");
+                    //Utils.error("Please enter a branch name.");
+                    System.out.println("Please enter a branch name.");
+                    System.exit(0);
                 }
                 Repository.merge(name);
                 break;
             default:
                 System.out.println("No command with that name exists.");
-                System.exit(-1);
+                System.exit(0);
                 //Utils.error("No command with that name exists.");
                 break;
         }
