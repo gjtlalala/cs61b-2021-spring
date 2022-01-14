@@ -365,14 +365,15 @@ public class Repository {
                     System.out.println("No commit with that id exists.");
                     return;
                 }
-                if(!curbranchtrackfile(filename)) {
-                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                    return;
-                }
+
             }
             copyfrommap = c.getMap();
             if(!copyfrommap.containsKey(filename)) {
                 System.out.println("File does not exist in that commit.");
+                return;
+            }
+            if(!curbranchtrackfile(filename)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
             String fileid = copyfrommap.get(filename);

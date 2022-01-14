@@ -15,9 +15,9 @@ public class Main {
      */
     public static void main(String[] args) {
         if (args.length == 0) {
-            //System.out.println("Please enter a command.");
-            //System.exit(-1);
-            Utils.error("Please enter a command.");
+            System.out.println("Please enter a command.");
+            System.exit(-1);
+            //Utils.error("Please enter a command.");
         }
 
         // TODO: what if args is empty?
@@ -75,11 +75,17 @@ public class Main {
                     Repository.checkout(null,null,name);
                 }
                 if (args.length == 3) {
+                    if (!args[1].equals("--")) {
+                        Utils.error("Incorrect operands.");
+                    }
                     name = args[2];
                     Repository.checkout(null,name,null);
                 }
                 if (args.length == 4) {
                     id = args[1];
+                    if (!args[2].equals("--")) {
+                        Utils.error("Incorrect operands.");
+                    }
                     name = args[3];
                     Repository.checkout(id,name,null);
                 }
@@ -117,9 +123,9 @@ public class Main {
                 Repository.merge(name);
                 break;
             default:
-                //System.out.println("No command with that name exists.");
-                //System.exit(-1);
-                Utils.error("No command with that name exists.");
+                System.out.println("No command with that name exists.");
+                System.exit(-1);
+                //Utils.error("No command with that name exists.");
                 break;
         }
     }
