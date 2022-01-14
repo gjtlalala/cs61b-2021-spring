@@ -98,6 +98,7 @@ public class Repository {
     }
     private static void sethead(String id) {
         writeContents(HEAD,id);
+        setbranchhead(getcurbranchname(),id);
     }
     private static Commit getheadcommit(){
         String id = getheadid();
@@ -229,7 +230,7 @@ public class Repository {
         Commit commit = new Commit(message,currentTime,parent,filemap);
         String id = commit.saveCommit();
         sethead(id);
-        setbranchhead(getcurbranchname(),id);
+
 
     }
     public static void rm(String name){
@@ -387,8 +388,9 @@ public class Repository {
                 System.out.println("No such branch exists.");
             }
             checkoutcommitidallfile(id);
-            sethead(id);
             setCurbranch(branchname);
+            sethead(id);
+
             clearstagingarea();
         }
     }
@@ -462,7 +464,7 @@ public class Repository {
                 restrictedDelete(f);
             }
         }*/
-        setbranchhead(getcurbranchname(),id);
+        //setbranchhead(getcurbranchname(),id);
         clearstagingarea();
         sethead(id);
     }
