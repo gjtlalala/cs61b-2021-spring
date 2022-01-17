@@ -443,10 +443,13 @@ public class Repository {
                 return;
             }
         }*/
-        File f = join(BRANCHDIR, name);
-        if(!restrictedDelete(f)) {
+        List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
+        if(!branchlist.contains(name)) {
             System.out.println("A branch with that name does not exist.");
+            return;
         }
+        File f = join(BRANCHDIR, name);
+        f.delete();
     }
     private static void clearstagingarea(){
         List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
