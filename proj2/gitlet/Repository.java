@@ -331,6 +331,10 @@ public class Repository {
         }
         return true;
     }
+    private static boolean fileexistcurworkingdir(String filename) {
+        File f = join(CWD, filename);
+        return f.exists();
+    }
     private static void checkoutcommitidallfile(String commitid){
         Commit c = Commit.getCommit(commitid);
         if(c == null) {
@@ -343,7 +347,7 @@ public class Repository {
         String branchfilename;
         for (Map.Entry<String, String> entry : copyfrommap.entrySet()) {
             branchfilename = entry.getKey();
-            if(fileuntrackedcurbranch(branchfilename)) {
+            if(fileuntrackedcurbranch(branchfilename) && fileexistcurworkingdir(branchfilename)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
@@ -382,7 +386,7 @@ public class Repository {
                 System.out.println("File does not exist in that commit.");
                 return;
             }
-            if(fileuntrackedcurbranch(filename)) {
+            if (fileuntrackedcurbranch(filename) && fileexistcurworkingdir(filename)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
@@ -390,8 +394,8 @@ public class Repository {
             //System.out.println("blobid "+ fileid);
             replaceworkingfile(fileid,filename);
         }
-        else if(branchname != null) {
-            if(branchname.equals(getcurbranchname())) {
+        else if (branchname != null) {
+            if (branchname.equals(getcurbranchname())) {
                 System.out.println("No need to checkout the current branch.");
                 return;
             }
