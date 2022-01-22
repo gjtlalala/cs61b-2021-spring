@@ -547,6 +547,17 @@ public class Repository {
         }
         return spiltid;
     }
+    private static void mergeconflict(String filename,String curid, String mergefileid) {
+        System.out.println("Encountered a merge conflict.");
+        File workfile = join(CWD,filename);
+        File curfile = join(OBJECT_DIR, curid);
+        File mergefile = join(OBJECT_DIR, mergefileid);
+        String m = "<<<<<<< HEAD\n" + readContentsAsString(curfile) + "=======\n" + readContentsAsString(mergefile) + ">>>>>>>";
+        writeContents(workfile,m);
+        String fileid = Utils.sha1(m);
+        createnewobject(workfile,fileid);
+        createstageaddfile(filename,fileid);
+    }
     public static void merge(String branchname){
         gitletdirinit();
         if (stagingareahasfile()) {
@@ -594,30 +605,32 @@ public class Repository {
                         createstageaddfile(filename, mergefileid);
                     }
                 }
-                else if(mergefileid != null && !mergefileid.equals(spiltid) && !mergefileid.equals(curid)){
-                    // cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
-                    System.out.println("Encountered a merge conflict.");
-                    File workfile = join(CWD,filename);
-                    File curfile = join(OBJECT_DIR, curid);
-                    File mergefile = join(OBJECT_DIR, mergefileid);
-                    String m = "<<<<<<< HEAD\n" + readContentsAsString(curfile) + "=======\n" + readContentsAsString(mergefile) + ">>>>>>>";
-                    writeContents(workfile,m);
-                    String fileid = Utils.sha1(m);
-                    createnewobject(workfile,fileid);
-                    createstageaddfile(filename,fileid);
+                else if(mergefileid == null || (!mergefileid.equals(spiltid) && !mergefileid.equals(curid))){
+                    //1.cur branch modify ,mergefile unexist
+                    //2. cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
+                    mergeconflict(filename,curid,mergefileid);
+                }
+            }
+            else if(mergefileid != null && !mergefileid.equals(spiltid)) {
+                //cur branch no exist ,mergefile exist and modifyed
+                mergeconflict(filename,curid,mergefileid);
+            }
+        }
+        for (Map.Entry<String, String> entry : mergemap.entrySet()) {
+            String filename = entry.getKey();// merge branch exist
+            if(!splitmap.containsKey(filename) ) {//split not exist
+                String mergefileid = mergemap.get(filename);
+                if(!curmap.containsKey(filename)) { //cur branch not exist
+                    replaceworkingfile(mergefileid, filename);
+                    createstageaddfile(filename, mergefileid);
+                }
+                else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id 
+                    mergeconflict(filename,curmap.get(filename),mergefileid);
                 }
             }
 
         }
-        for (Map.Entry<String, String> entry : mergemap.entrySet()) {
-            String filename = entry.getKey();// merge branch exist
-            if(!splitmap.containsKey(filename) && !curmap.containsKey(filename)) {//split not exist ,cur branch not exist
-                String mergefileid = mergemap.get(filename);
-                replaceworkingfile(mergefileid,filename);
-                createstageaddfile(filename,mergefileid);
-            }
-        }
-        commit("Merged "+ branchname + "into "+getcurbranchname()+".");
+        commit("Merged "+ branchname + " into "+getcurbranchname()+".");
     }
 
 }
