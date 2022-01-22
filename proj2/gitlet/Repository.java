@@ -550,9 +550,17 @@ public class Repository {
     private static void mergeconflict(String filename,String curid, String mergefileid) {
         System.out.println("Encountered a merge conflict.");
         File workfile = join(CWD,filename);
-        File curfile = join(OBJECT_DIR, curid);
-        File mergefile = join(OBJECT_DIR, mergefileid);
-        String m = "<<<<<<< HEAD\n" + readContentsAsString(curfile) + "=======\n" + readContentsAsString(mergefile) + ">>>>>>>";
+        String m = "<<<<<<< HEAD\n";
+        if(curid != null) {
+            File curfile = join(OBJECT_DIR, curid);
+            m += readContentsAsString(curfile);
+        }
+        m +=  "=======\n";
+        if(mergefileid != null) {
+            File mergefile = join(OBJECT_DIR, mergefileid);
+            m += readContentsAsString(mergefile);
+        }
+        m += ">>>>>>>";
         writeContents(workfile,m);
         String fileid = Utils.sha1(m);
         createnewobject(workfile,fileid);
@@ -605,10 +613,13 @@ public class Repository {
                         createstageaddfile(filename, mergefileid);
                     }
                 }
-                else if(mergefileid == null || (!mergefileid.equals(spiltid) && !mergefileid.equals(curid))){
+                else if(mergefileid == null) {
                     //1.cur branch modify ,mergefile unexist
+                    mergeconflict(filename, curid, mergefileid);
+                }
+                else if (!mergefileid.equals(spiltid) && !mergefileid.equals(curid))){
                     //2. cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
-                    mergeconflict(filename,curid,mergefileid);
+                    mergeconflict(filename, curid, mergefileid);
                 }
             }
             else if(mergefileid != null && !mergefileid.equals(spiltid)) {
@@ -624,7 +635,7 @@ public class Repository {
                     replaceworkingfile(mergefileid, filename);
                     createstageaddfile(filename, mergefileid);
                 }
-                else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id 
+                else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id
                     mergeconflict(filename,curmap.get(filename),mergefileid);
                 }
             }
