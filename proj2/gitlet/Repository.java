@@ -617,7 +617,7 @@ public class Repository {
                     //1.cur branch modify ,mergefile unexist
                     mergeconflict(filename, curid, mergefileid);
                 }
-                else if (!mergefileid.equals(spiltid) && !mergefileid.equals(curid))){
+                else if (!mergefileid.equals(spiltid) && !mergefileid.equals(curid)){
                     //2. cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
                     mergeconflict(filename, curid, mergefileid);
                 }
