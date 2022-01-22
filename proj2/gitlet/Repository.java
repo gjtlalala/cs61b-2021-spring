@@ -476,12 +476,11 @@ public class Repository {
     }
     private static void clearstagingarea(){
         List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
-        if (filelist == null) {
-            return;
-        }
-        for (String name: filelist) {
-            File stagfile = join(STAGINGADD_DIR,name);
-            stagfile.delete();//restrictedDelete(stagfile);
+        if (filelist != null) {
+            for (String name : filelist) {
+                File stagfile = join(STAGINGADD_DIR, name);
+                stagfile.delete();//restrictedDelete(stagfile);
+            }
         }
         filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
         if (filelist == null) {
