@@ -549,7 +549,7 @@ public class Repository {
     }
     public static void merge(String branchname){
         gitletdirinit();
-        if (!stagingareahasfile()) {
+        if (stagingareahasfile()) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
