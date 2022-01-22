@@ -4,6 +4,9 @@ package gitlet;
 
 //import com.sun.codemodel.internal.JForEach;
 
+//import edu.princeton.cs.algs4.ST;
+//import ucb.anim.graphs.Graph;
+
 import java.io.File;
 //import java.sql.DataTruncation;
 import java.text.DateFormat;
@@ -47,14 +50,14 @@ public class Repository {
 
     //private static LinkedList<Commit> commitslist;
 
-    private static class Branch{
+    /*private static class Branch{
         private String name;
         private String  headid;
         Branch(String name,String headid){
             this.name = name;
             this.headid = headid;
         }
-    }
+    }*/
     private static void gitletdirinit() {
         if (!GITLET_DIR.exists()) {
             System.out.println("Not in an initialized Gitlet directory.");
@@ -107,6 +110,7 @@ public class Repository {
     private static String getheadid(){
          return readContentsAsString(HEAD);
     }
+
 
     private static File  getstagingaddfile(String filename){
         List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
@@ -347,7 +351,7 @@ public class Repository {
         String branchfilename;
         for (Map.Entry<String, String> entry : copyfrommap.entrySet()) {
             branchfilename = entry.getKey();
-            if(fileuntrackedcurbranch(branchfilename) && fileexistcurworkingdir(branchfilename)) {
+            if (fileexistcurworkingdir(branchfilename) && fileuntrackedcurbranch(branchfilename)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
@@ -386,7 +390,7 @@ public class Repository {
                 System.out.println("File does not exist in that commit.");
                 return;
             }
-            if (fileuntrackedcurbranch(filename) && fileexistcurworkingdir(filename)) {
+            if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
@@ -399,8 +403,12 @@ public class Repository {
                 System.out.println("No need to checkout the current branch.");
                 return;
             }
-            List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
+            /*List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
             if(!branchlist.contains(branchname)) {
+                System.out.println("No such branch exists.");
+                return;
+            }*/
+            if (!branchexist(branchname)) {
                 System.out.println("No such branch exists.");
                 return;
             }
@@ -411,6 +419,13 @@ public class Repository {
 
             clearstagingarea();
         }
+    }
+    private static boolean branchexist(String branchname) {
+        List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
+        if(branchlist.contains(branchname)) {
+           return true;
+        }
+        return false;
     }
     private static String  getcurbranchname(){
         /*List<String> filelist = plainFilenamesIn(BRANCHDIR);
@@ -447,8 +462,12 @@ public class Repository {
                 return;
             }
         }*/
-        List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
+        /*List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
         if(!branchlist.contains(name)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }*/
+        if (!branchexist(name)) {
             System.out.println("A branch with that name does not exist.");
             return;
         }
@@ -489,9 +508,118 @@ public class Repository {
         clearstagingarea();
         sethead(id);
     }
-    public static void merge(String name){
-        gitletdirinit();
+    private static boolean stagingareahasfile() {
+        List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
+        if (filelist == null || filelist.isEmpty()) {
+            return false;
+        }
+        filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
+        if (filelist == null || filelist.isEmpty()) {
+            return false;
 
+        }
+        return true;
+    }
+    /*private static boolean mergenecessary(String filename) {
+
+    }
+    private static boolean hasconflict(String filename) {
+
+    }*/
+    private static String getsplitid(Commit mergebranch, Commit curbranch) {
+        HashSet<String> set = new HashSet<>();
+        String spiltid = null;
+        while(curbranch != null && mergebranch != null) {
+            if(!set.contains(curbranch.getParentID())) {
+                set.add(curbranch.getParentID());
+                curbranch = curbranch.getParentcommit();
+            }
+            else {
+                spiltid = curbranch.getParentID();
+                break;
+            }
+            if(!set.contains(mergebranch.getParentID())) {
+                set.add(mergebranch.getParentID());
+                mergebranch = mergebranch.getParentcommit();
+            }
+            else {
+                spiltid = mergebranch.getParentID();
+                break;
+            }
+        }
+        return spiltid;
+    }
+    public static void merge(String branchname){
+        gitletdirinit();
+        if (!stagingareahasfile()) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        if (!branchexist(branchname)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+        if (branchname.equals(getcurbranchname())) {
+            System.out.println("Cannot merge a branch with itself.");
+            return;
+        }
+        Commit curbranchhead = getheadcommit();
+        String mergebranchheadid = getbranchheadid(branchname);
+        Commit mergebranchhead = Commit.getCommit(mergebranchheadid);
+        String spiltid = getsplitid(mergebranchhead,curbranchhead);
+        if (spiltid == null) {
+            System.out.println("ERROR,cannot find the split id");
+            System.exit(0);
+        }
+        if (spiltid.equals(mergebranchheadid)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        Commit splitcommit = Commit.getCommit(spiltid);
+        Map<String, String> splitmap = splitcommit.getMap();
+        Map<String, String> curmap = curbranchhead.getMap();
+        Map<String, String> mergemap = mergebranchhead.getMap();
+        List<String>  workinglist = plainFilenamesIn(CWD);
+        for (Map.Entry<String, String> entry : splitmap.entrySet()) {//split map
+            String filename = entry.getKey();
+            String splitid = entry.getValue();
+            String curid = curmap.get(filename);
+            String mergefileid = mergemap.get(filename);//maybe null
+            if(curid != null) { // cur branch exist
+                if (splitid.equals(curid)) {//cur branch not modify
+                    if (mergefileid == null) { //merge branch not exist
+                        File f = join(CWD, filename);
+                        f.delete();
+                        createstageremovefile(filename);
+                    } else if (!splitid.equals(mergefileid)) {//merge branch modify
+                        replaceworkingfile(mergefileid, filename);
+                        createstageaddfile(filename, mergefileid);
+                    }
+                }
+                else if(mergefileid != null && !mergefileid.equals(spiltid) && !mergefileid.equals(curid)){
+                    // cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
+                    System.out.println("Encountered a merge conflict.");
+                    File workfile = join(CWD,filename);
+                    File curfile = join(OBJECT_DIR, curid);
+                    File mergefile = join(OBJECT_DIR, mergefileid);
+                    String m = "<<<<<<< HEAD\n" + readContentsAsString(curfile) + "=======\n" + readContentsAsString(mergefile) + ">>>>>>>";
+                    writeContents(workfile,m);
+                    String fileid = Utils.sha1(m);
+                    createnewobject(workfile,fileid);
+                    createstageaddfile(filename,fileid);
+                }
+            }
+
+        }
+        for (Map.Entry<String, String> entry : mergemap.entrySet()) {
+            String filename = entry.getKey();// merge branch exist
+            if(!splitmap.containsKey(filename) && !curmap.containsKey(filename)) {//split not exist ,cur branch not exist
+                String mergefileid = mergemap.get(filename);
+                replaceworkingfile(mergefileid,filename);
+                createstageaddfile(filename,mergefileid);
+            }
+        }
+        commit("Merged "+ branchname + "into "+getcurbranchname()+".");
     }
 
 }
