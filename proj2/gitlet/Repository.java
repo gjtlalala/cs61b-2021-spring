@@ -509,13 +509,12 @@ public class Repository {
     }
     private static boolean stagingareahasfile() {
         List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
-        if (filelist == null || filelist.isEmpty()) {
+        if ( filelist.isEmpty()) {
             return false;
         }
         filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
-        if (filelist == null || filelist.isEmpty()) {
+        if (filelist.isEmpty()) {
             return false;
-
         }
         return true;
     }
