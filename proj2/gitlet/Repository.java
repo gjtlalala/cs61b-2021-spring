@@ -596,8 +596,8 @@ public class Repository {
         Map<String, String> splitmap = splitcommit.getMap();
         Map<String, String> curmap = curbranchhead.getMap();
         Map<String, String> mergemap = mergebranchhead.getMap();
-        List<String>  workinglist = plainFilenamesIn(CWD);
-        for (Map.Entry<String, String> entry : splitmap.entrySet()) {//split map
+       // List<String>  workinglist = plainFilenamesIn(CWD);
+        for (Map.Entry<String, String> entry : splitmap.entrySet()) {//split  exist
             String filename = entry.getKey();
             String splitid = entry.getValue();
             String curid = curmap.get(filename);
@@ -615,15 +615,18 @@ public class Repository {
                 }
                 else if(mergefileid == null) {
                     //1.cur branch modify ,mergefile unexist
+                    System.out.println("11111");
                     mergeconflict(filename, curid, mergefileid);
                 }
                 else if (!mergefileid.equals(spiltid) && !mergefileid.equals(curid)){
                     //2. cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
+                    System.out.println("222");
                     mergeconflict(filename, curid, mergefileid);
                 }
             }
             else if(mergefileid != null && !mergefileid.equals(spiltid)) {
                 //cur branch no exist ,mergefile exist and modifyed
+                System.out.println("333");
                 mergeconflict(filename,curid,mergefileid);
             }
         }
@@ -636,6 +639,7 @@ public class Repository {
                     createstageaddfile(filename, mergefileid);
                 }
                 else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id
+                    System.out.println("444");
                     mergeconflict(filename,curmap.get(filename),mergefileid);
                 }
             }
