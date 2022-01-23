@@ -609,24 +609,28 @@ public class Repository {
                         f.delete();
                         createstageremovefile(filename);
                     } else if (!splitid.equals(mergefileid)) {//merge branch modify
+                        if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+                            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                            System.exit(0);
+                        }
                         replaceworkingfile(mergefileid, filename);
                         createstageaddfile(filename, mergefileid);
                     }
                 }
                 else if(mergefileid == null) {
                     //1.cur branch modify ,mergefile unexist
-                    System.out.println("11111");
+                    System.out.println("11111"+ filename);
                     mergeconflict(filename, curid, mergefileid);
                 }
                 else if (!mergefileid.equals(spiltid) && !mergefileid.equals(curid)){
                     //2. cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
-                    System.out.println("222");
+                    System.out.println("222"+ filename);
                     mergeconflict(filename, curid, mergefileid);
                 }
             }
             else if(mergefileid != null && !mergefileid.equals(spiltid)) {
                 //cur branch no exist ,mergefile exist and modifyed
-                System.out.println("333");
+                System.out.println("333"+ filename+mergefileid+spiltid);
                 mergeconflict(filename,curid,mergefileid);
             }
         }
@@ -635,17 +639,22 @@ public class Repository {
             if(!splitmap.containsKey(filename) ) {//split not exist
                 String mergefileid = mergemap.get(filename);
                 if(!curmap.containsKey(filename)) { //cur branch not exist
+                    if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+                        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                        System.exit(0);
+                    }
                     replaceworkingfile(mergefileid, filename);
                     createstageaddfile(filename, mergefileid);
                 }
                 else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id
-                    System.out.println("444");
+                    System.out.println("444"+ filename);
                     mergeconflict(filename,curmap.get(filename),mergefileid);
                 }
             }
 
         }
         commit("Merged "+ branchname + " into "+getcurbranchname()+".");
+        setbranchhead(branchname,getheadid());//both cur branch head and merge branch head are the new commit;
     }
 
 }
