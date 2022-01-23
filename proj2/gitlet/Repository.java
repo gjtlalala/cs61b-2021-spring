@@ -550,7 +550,7 @@ public class Repository {
     private static void mergeconflict(String filename,String curid, String mergefileid) {
         System.out.println("Encountered a merge conflict.");
         File workfile = join(CWD,filename);
-        String m = "<<<<<<< HEAD\n";
+        /*String m = "<<<<<<< HEAD\n";
         if(curid != null) {
             File curfile = join(OBJECT_DIR, curid);
             m += readContentsAsString(curfile);
@@ -560,9 +560,23 @@ public class Repository {
             File mergefile = join(OBJECT_DIR, mergefileid);
             m += readContentsAsString(mergefile);
         }
-        m += ">>>>>>>";
-        writeContents(workfile,m);
-        String fileid = Utils.sha1(m);
+        m += ">>>>>>>";*/
+        StringBuilder  m = new StringBuilder();
+        m.append("<<<<<<< HEAD");
+        m.append("\n");
+        if(curid != null) {
+            File curfile = join(OBJECT_DIR, curid);
+            m.append(readContentsAsString(curfile));
+        }
+        m.append("=======");
+        m.append("\n");
+        if(mergefileid != null) {
+            File mergefile = join(OBJECT_DIR, mergefileid);
+            m.append(readContentsAsString(mergefile));
+        }
+        m.append(">>>>>>>");
+        writeContents(workfile,m.toString());
+        String fileid = Utils.sha1(m.toString());
         createnewobject(workfile,fileid);
         createstageaddfile(filename,fileid);
     }
@@ -585,7 +599,7 @@ public class Repository {
         Commit mergebranchhead = Commit.getCommit(mergebranchheadid);
         String spiltid = getsplitid(mergebranchhead,curbranchhead);
         if (spiltid == null) {
-            System.out.println("ERROR,cannot find the split id");
+            System.out.println("Current branch fast-forwarded.");///?????does not know why,maybe wrong
             System.exit(0);
         }
         if (spiltid.equals(mergebranchheadid)) {
@@ -597,6 +611,32 @@ public class Repository {
         Map<String, String> curmap = curbranchhead.getMap();
         Map<String, String> mergemap = mergebranchhead.getMap();
        // List<String>  workinglist = plainFilenamesIn(CWD);
+        for (Map.Entry<String, String> entry : mergemap.entrySet()) {
+            String filename = entry.getKey();// merge branch exist
+            if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+        }
+        for (Map.Entry<String, String> entry : mergemap.entrySet()) {
+            String filename = entry.getKey();// merge branch exist
+            if(!splitmap.containsKey(filename) ) {//split not exist
+                String mergefileid = mergemap.get(filename);
+                if(!curmap.containsKey(filename)) { //cur branch not exist
+                    /*if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+                        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                        System.exit(0);
+                    }*/
+                    replaceworkingfile(mergefileid, filename);
+                    createstageaddfile(filename, mergefileid);
+                }
+                else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id
+                    //System.out.println("444"+ filename);
+                    mergeconflict(filename,curmap.get(filename),mergefileid);
+                }
+            }
+
+        }
         for (Map.Entry<String, String> entry : splitmap.entrySet()) {//split  exist
             String filename = entry.getKey();
             String splitfileid = entry.getValue();
@@ -609,10 +649,10 @@ public class Repository {
                         f.delete();
                         createstageremovefile(filename);
                     } else if (!splitfileid.equals(mergefileid)) {//merge branch modify
-                        if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+                        /*if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
                             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                             System.exit(0);
-                        }
+                        }*/
                         replaceworkingfile(mergefileid, filename);
                         createstageaddfile(filename, mergefileid);
                     }
@@ -634,25 +674,8 @@ public class Repository {
                 mergeconflict(filename,curid,mergefileid);
             }
         }
-        for (Map.Entry<String, String> entry : mergemap.entrySet()) {
-            String filename = entry.getKey();// merge branch exist
-            if(!splitmap.containsKey(filename) ) {//split not exist
-                String mergefileid = mergemap.get(filename);
-                if(!curmap.containsKey(filename)) { //cur branch not exist
-                    if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
-                        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                        System.exit(0);
-                    }
-                    replaceworkingfile(mergefileid, filename);
-                    createstageaddfile(filename, mergefileid);
-                }
-                else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id
-                    //System.out.println("444"+ filename);
-                    mergeconflict(filename,curmap.get(filename),mergefileid);
-                }
-            }
 
-        }
+
         commit("Merged "+ branchname + " into "+getcurbranchname()+".");
         setbranchhead(branchname,getheadid());//both cur branch head and merge branch head are the new commit;
     }
