@@ -599,16 +599,16 @@ public class Repository {
        // List<String>  workinglist = plainFilenamesIn(CWD);
         for (Map.Entry<String, String> entry : splitmap.entrySet()) {//split  exist
             String filename = entry.getKey();
-            String splitid = entry.getValue();
+            String splitfileid = entry.getValue();
             String curid = curmap.get(filename);
             String mergefileid = mergemap.get(filename);//maybe null
             if(curid != null) { // cur branch exist
-                if (splitid.equals(curid)) {//cur branch not modify
+                if (splitfileid.equals(curid)) {//cur branch not modify
                     if (mergefileid == null) { //merge branch not exist
                         File f = join(CWD, filename);
                         f.delete();
                         createstageremovefile(filename);
-                    } else if (!splitid.equals(mergefileid)) {//merge branch modify
+                    } else if (!splitfileid.equals(mergefileid)) {//merge branch modify
                         if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
                             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                             System.exit(0);
@@ -619,18 +619,18 @@ public class Repository {
                 }
                 else if(mergefileid == null) {
                     //1.cur branch modify ,mergefile unexist
-                    System.out.println("11111"+ filename);
+                    //System.out.println("11111"+ filename);
                     mergeconflict(filename, curid, mergefileid);
                 }
-                else if (!mergefileid.equals(spiltid) && !mergefileid.equals(curid)){
+                else if (!mergefileid.equals(splitfileid) && !mergefileid.equals(curid)){
                     //2. cur branch modify ,merge exist modify and not equal split , files modified in different ways in the current and given branches
-                    System.out.println("222"+ filename);
+                    //System.out.println("222"+ filename);
                     mergeconflict(filename, curid, mergefileid);
                 }
             }
-            else if(mergefileid != null && !mergefileid.equals(spiltid)) {
+            else if(mergefileid != null && !mergefileid.equals(splitfileid)) {
                 //cur branch no exist ,mergefile exist and modifyed
-                System.out.println("333"+ filename+mergefileid+spiltid);
+                //System.out.println("333"+ filename+mergefileid+splitfileid);
                 mergeconflict(filename,curid,mergefileid);
             }
         }
@@ -647,7 +647,7 @@ public class Repository {
                     createstageaddfile(filename, mergefileid);
                 }
                 else if(!curmap.get(filename).equals(mergefileid)) {//cur branch exist ,not equal to merge id
-                    System.out.println("444"+ filename);
+                    //System.out.println("444"+ filename);
                     mergeconflict(filename,curmap.get(filename),mergefileid);
                 }
             }
