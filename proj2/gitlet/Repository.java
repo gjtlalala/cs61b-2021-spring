@@ -399,26 +399,24 @@ public class Repository {
             replaceworkingfile(fileid,filename);
         }
         else if (branchname != null) {
-            if (branchname.equals(getcurbranchname())) {
-                System.out.println("No need to checkout the current branch.");
-                return;
-            }
-            /*List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
-            if(!branchlist.contains(branchname)) {
-                System.out.println("No such branch exists.");
-                return;
-            }*/
-            if (!branchexist(branchname)) {
-                System.out.println("No such branch exists.");
-                return;
-            }
-            String id = getbranchheadid(branchname);
-            checkoutcommitidallfile(id);
-            setCurbranch(branchname);
-            sethead(id);
-
-            clearstagingarea();
+            checkoutbranch(branchname);
         }
+    }
+    private static void checkoutbranch(String branchname) {
+        if (branchname.equals(getcurbranchname())) {
+            System.out.println("No need to checkout the current branch.");
+            return;
+        }
+        if (!branchexist(branchname)) {
+            System.out.println("No such branch exists.");
+            return;
+        }
+        String id = getbranchheadid(branchname);
+        checkoutcommitidallfile(id);
+        setCurbranch(branchname);
+        sethead(id);
+
+        clearstagingarea();
     }
     private static boolean branchexist(String branchname) {
         List<String>  branchlist = plainFilenamesIn(BRANCHDIR);
@@ -508,12 +506,10 @@ public class Repository {
         sethead(id);
     }
     private static boolean stagingareahasfile() {
-        List<String> filelist = plainFilenamesIn(STAGINGADD_DIR);
-        if ( filelist.isEmpty()) {
-            return false;
-        }
-        filelist = plainFilenamesIn(STAGINGREMOVE_DIR);
-        if (filelist.isEmpty()) {
+        //Boolean ret = false;
+        List<String> filelist1 = plainFilenamesIn(STAGINGADD_DIR);
+        List<String> filelist2 = plainFilenamesIn(STAGINGREMOVE_DIR);
+        if ( filelist1.isEmpty() && filelist2.isEmpty()) {
             return false;
         }
         return true;
@@ -524,10 +520,10 @@ public class Repository {
     private static boolean hasconflict(String filename) {
 
     }*/
-    private static String getsplitid(Commit mergebranch, Commit curbranch) {
+    private static String getsplitid(Commit mergebranch, Commit curbranch,String mergeid,String headid) {
         HashSet<String> set = new HashSet<>();
         String spiltid = null;
-        while(curbranch != null && mergebranch != null) {
+        /*while(curbranch != null && mergebranch != null) {
             if(!set.contains(curbranch.getParentID())) {
                 set.add(curbranch.getParentID());
                 curbranch = curbranch.getParentcommit();
@@ -544,8 +540,30 @@ public class Repository {
                 spiltid = mergebranch.getParentID();
                 break;
             }
+        }*/
+        set.add(headid);
+        set.add(mergeid);
+        while(curbranch != null || mergebranch != null) {
+            if (curbranch != null) {
+                if (!set.contains(curbranch.getParentID())) {
+                    set.add(curbranch.getParentID());
+                    curbranch = curbranch.getParentcommit();
+                } else {
+                    spiltid = curbranch.getParentID();
+                    return spiltid;//break;
+                }
+            }
+            if (mergebranch != null) {
+                if (!set.contains(mergebranch.getParentID())) {
+                    set.add(mergebranch.getParentID());
+                    mergebranch = mergebranch.getParentcommit();
+                } else {
+                    spiltid = mergebranch.getParentID();
+                    return spiltid;//break;
+                }
+            }
         }
-        return spiltid;
+        return null;
     }
     private static void mergeconflict(String filename,String curid, String mergefileid) {
         System.out.println("Encountered a merge conflict.");
@@ -596,13 +614,15 @@ public class Repository {
         }
         Commit curbranchhead = getheadcommit();
         String mergebranchheadid = getbranchheadid(branchname);
+        String headid = getheadid();
         Commit mergebranchhead = Commit.getCommit(mergebranchheadid);
-        String spiltid = getsplitid(mergebranchhead,curbranchhead);
-        if (spiltid == null) {
+        String spiltid = getsplitid(mergebranchhead,curbranchhead,mergebranchheadid,headid);
+        if (spiltid.equals(mergebranchheadid)) {
             System.out.println("Given branch is an ancestor of the current branch.");///?????does not know why,maybe wrong
             System.exit(0);
         }
-        if (spiltid.equals(getheadid())) {
+        if (spiltid.equals(headid)) {
+            checkoutbranch(branchname);
             System.out.println("Current branch fast-forwarded.");
             System.exit(0);
         }
