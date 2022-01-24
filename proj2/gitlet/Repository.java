@@ -599,11 +599,11 @@ public class Repository {
         Commit mergebranchhead = Commit.getCommit(mergebranchheadid);
         String spiltid = getsplitid(mergebranchhead,curbranchhead);
         if (spiltid == null) {
-            System.out.println("Current branch fast-forwarded.");///?????does not know why,maybe wrong
+            System.out.println("Given branch is an ancestor of the current branch.");///?????does not know why,maybe wrong
             System.exit(0);
         }
-        if (spiltid.equals(mergebranchheadid)) {
-            System.out.println("Given branch is an ancestor of the current branch.");
+        if (spiltid.equals(getheadid())) {
+            System.out.println("Current branch fast-forwarded.");
             System.exit(0);
         }
         Commit splitcommit = Commit.getCommit(spiltid);
@@ -613,7 +613,8 @@ public class Repository {
        // List<String>  workinglist = plainFilenamesIn(CWD);
         for (Map.Entry<String, String> entry : mergemap.entrySet()) {
             String filename = entry.getKey();// merge branch exist
-            if (fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+            if (!splitmap.containsKey(filename) && fileexistcurworkingdir(filename) && fileuntrackedcurbranch(filename)) {
+                //split map not exist
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 System.exit(0);
             }
