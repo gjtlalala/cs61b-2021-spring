@@ -89,11 +89,25 @@ public class Commit implements Serializable {
     }
     public static Commit getCommit(String id){
         //sTrie
-        File f = join(COMMIT_FOLDER,id);
-        if(f.exists()) {
-            return readObject(f, Commit.class);
+        if(id.length() < 40){
+            List<String> commitlist = Utils.plainFilenamesIn(COMMIT_FOLDER);
+            for (String name: commitlist) {
+                if(name.substring(0,id.length()).equals(id)){
+                    File f = join(COMMIT_FOLDER, name);
+                    if (f.exists()) {
+                        return readObject(f, Commit.class);
+                    }
+                    return null;
+                }
+            }
+            return null;
+        }else {
+            File f = join(COMMIT_FOLDER, id);
+            if (f.exists()) {
+                return readObject(f, Commit.class);
+            }
+            return null;
         }
-        return null;
     }
     public static void globallog(){
         Commit c;

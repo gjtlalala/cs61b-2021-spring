@@ -284,9 +284,10 @@ public class Repository {
             System.out.println("error branch is null");
             return;
         }*/
-        String curbranchheadid = getheadid();
+        //String curbranchheadid = getheadid();
         for(String branchname: branchlist) {
-            if(getbranchheadid(branchname).equals(curbranchheadid)) {
+            //if(getbranchheadid(branchname).equals(curbranchheadid)) {
+            if(getcurbranchname().equals(branchname)){
                 System.out.println("*"+branchname);
             }
             else
